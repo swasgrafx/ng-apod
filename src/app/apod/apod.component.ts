@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-//1. Import ActivatedRoute
+
 import { ActivatedRoute } from '@angular/router';
 import { ApodService } from '../api/apod.service';
 import { Apod } from '../models/apod';
@@ -12,32 +12,45 @@ import { Apod } from '../models/apod';
 export class ApodComponent implements OnInit {
 
   apod:Apod;
+  date:string;
 
   constructor(
     private apodService: ApodService,
-    //2. Inject ActivatedRoute into the constructor
     private router: ActivatedRoute
   ) { }
 
   ngOnInit() {
-    //3. Subscribe to parameterized route
     this.router.params.subscribe((params) => {
       this.getApod(params['date']);
     });
   }
 
-  //4. Replace the current date with an updated method signature
   getApod(date:string): void{
+
+    //If the date is falsy, use today's date
+    if(!date){
+      date = new Date().toISOString().slice(0,10);
+    }
 
     this.apodService.getApod(date).subscribe(
       (response:any)=>{
         this.apod = response;
 
-        //5. Log the results to the JS console
+        this.date = this.randomDate(new Date(1995,5,16), new Date());
+
         console.log(response);
       }
     );
 
+  }
+
+  randomDate(start, end): string{
+    let date = new Date(
+      start.getTime() + Math.random() *
+        (end.getTime() - start.getTime())
+    );
+
+    return new Date(date).toISOString().slice(0,10);
   }
 
 }
